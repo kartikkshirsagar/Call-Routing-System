@@ -14,6 +14,10 @@
 #define min_capacity ceil(capacity/2)
 #define INITSIZE 4
 #define COVERAGE_RADIUS 10
+typedef struct pair{
+    int x;
+    int y;
+}coordinate;
 typedef struct mobile_phone{
   int id;
   coordinate coordinates;
@@ -51,11 +55,6 @@ typedef struct BPlus_Tree_Node{
     }type;
 
 }treeNode;
-
-typedef struct pair{
-    int x;
-    int y;
-}coordinate;
 
 void initVector(vector *a) {
   a->array = (int *)malloc(INITSIZE * sizeof(int));
