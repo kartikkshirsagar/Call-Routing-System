@@ -18,7 +18,10 @@ typedef struct mobile_phone{
   int id;
   coordinate coordinates;
 }mobile;
-
+typedef struct base_station{
+  coordinate coordinates;
+  int id;
+}base_station;
 
 typedef struct {
   int *array;
@@ -27,7 +30,7 @@ typedef struct {
 } vector;
 
 typedef struct Index_node_type{
-    int data;
+    base_station bs;
     struct BPlus_Tree_Node* first;
     struct BPlus_Tree_Node* second;
     struct BPlus_Tree_Node* third;
@@ -35,7 +38,7 @@ typedef struct Index_node_type{
     
 }indexNode;
 typedef struct data_node_type{
-    int data[4];
+    mobile data[4];
     struct BPlus_Tree_Node* next;
     struct BPlus_Tree_Node* prev;
 }dataNode;
