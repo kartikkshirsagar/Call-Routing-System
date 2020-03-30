@@ -1,9 +1,9 @@
 //ESSENTIALS
 /*
 1)Lets assume a 2D world and each mobile and the base have their respective locations identified by 
-  their co-ordinates.Distance will be calculated as per co-ordinate geometry.
-2)Every base station has a coverage radius of 
-3) The data in index node would be the distance from some reference.
+  their co-ordinates.
+2)Every base station has a coordinate, mobile also has co ordinates.
+3) The data in index node would be the base station data struct.
 */
 
 #include<stdio.h>
@@ -14,6 +14,9 @@
 #define min_capacity ceil(capacity/2)
 #define INITSIZE 4
 #define COVERAGE_RADIUS 10
+
+typedef enum{FAILURE,SUCCESS} status_code;
+typedef enum{FALSE,TRUE} boolean;
 typedef struct pair{
     int x;
     int y;
@@ -43,16 +46,18 @@ typedef struct Index_node_type{
 }indexNode;
 typedef struct data_node_type{
     mobile data[4];
+	int used;
     struct BPlus_Tree_Node* next;
     struct BPlus_Tree_Node* prev;
 }dataNode;
-
-typedef struct BPlus_Tree_Node{
-    char tag;
-    union type{
+union type{
         struct data_node_type dataNode;
         struct Index_node_type indexNode;
-    }type;
+    };
+typedef struct BPlus_Tree_Node{
+    char tag;
+	union type *type;
+    
 
 }treeNode;
 
@@ -115,7 +120,61 @@ void printVector(vector *a){
 }
 
 
+coordinate shiftPoint(coordinate newOrigin,coordinate oldOrigin,coordinate point)
+{
+  int xtemp=newOrigin.x-oldOrigin.x;
+  int ytemp=newOrigin.y-oldOrigin.y;
 
+  coordinate new;
+  new.x = point.x - xtemp;
+  new.y = point.y - ytemp; 
+  return new;
+}
+boolean isDataNodeFull(treeNode* nodeptr)
+{
+	boolean retval=FALSE;
+	if (nodeptr->type->dataNode.used==capacity)
+	{
+		retval=TRUE;
+	}
+	return retval;
+}
+
+status_code InsertMobile(mobile mobile,treeNode* root)
+{	
+	status_code retval;
+	if(root->tag=='d')
+	{
+		//WE FOUND THE DATA NODE
+		if(isDataNodeFull(root)==TRUE)
+		{
+			//SPLIT THE DATA NODE AND INSERT NODE IN PARENT
+		}
+		else{
+			// INSERT THE MOBILE IN DATA NODE
+			
+			root->type->dataNode.data[root->type->dataNode.used]=mobile;
+		}
+	}
+
+	if(root->type->indexNode.bs.coordinates.x>0 && root->type->indexNode.bs.coordinates.y>0)
+	{
+		InsertMobile(mobile,root->type->indexNode.first);
+	}
+	if(root->type->indexNode.bs.coordinates.x<0 && root->type->indexNode.bs.coordinates.y>0)
+	{
+		InsertMobile(mobile,root->type->indexNode.second);
+	}
+	if(root->type->indexNode.bs.coordinates.x<0 && root->type->indexNode.bs.coordinates.y<0)
+	{
+		InsertMobile(mobile,root->type->indexNode.third);
+	}
+	if(root->type->indexNode.bs.coordinates.x>0 && root->type->indexNode.bs.coordinates.y<0)
+	{
+		InsertMobile(mobile,root->type->indexNode.fourth);
+	}
+	return retval;
+}
 
 
 int main(){
