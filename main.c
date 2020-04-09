@@ -149,6 +149,23 @@ void printVector(vector *a)
 //   new.y = point.y - ytemp;
 //   return new;
 // }
+
+mobile MakeMobile(int id,int x)
+{
+	mobile m;
+	m.id=id;
+	m.x=x;
+	return m;
+}
+
+base_station Makebs(int id,int x)
+{
+	base_station bs;
+	bs.id=id;
+	bs.x=x;
+	return bs;
+}
+
 boolean isDataNodeFull(treeNode *nodeptr)
 {
 	boolean retval = FALSE;
@@ -216,7 +233,7 @@ status_code InsertMobile(mobile mobile, treeNode *root)
 	{
 	case 1:
 		/* code */
-		if(nearest->type.indexNode->first->type.dataNode->used==capacity)
+		if(isDataNodeFull(nearest->type.indexNode->first))
 		{
 			retval= FAILURE;
 		}
@@ -226,7 +243,7 @@ status_code InsertMobile(mobile mobile, treeNode *root)
 		
 		break;
 	case 2:
-		if(nearest->type.indexNode->second->type.dataNode->used==capacity)
+		if(isDataNodeFull(nearest->type.indexNode->second))
 		{
 			retval = FAILURE;
 		}
@@ -235,7 +252,7 @@ status_code InsertMobile(mobile mobile, treeNode *root)
 		}
 		break;
 	case 3:
-		if(nearest->type.indexNode->third->type.dataNode->used==capacity)
+		if(isDataNodeFull(nearest->type.indexNode->third))
 		{
 			retval=FAILURE;
 		}
@@ -244,7 +261,7 @@ status_code InsertMobile(mobile mobile, treeNode *root)
 		}
 		break;
 	case 4:
-		if(nearest->type.indexNode->fourth->type.dataNode->used==capacity)
+		if(isDataNodeFull(nearest->type.indexNode->fourth))
 		{
 			retval= FAILURE;
 		}
@@ -257,6 +274,157 @@ status_code InsertMobile(mobile mobile, treeNode *root)
 	}
 
 	return retval;
+}
+status_code DeleteinData(mobile m,treeNode* dataNode)
+{	int i,ind;status_code retval=FAILURE;
+	mobile* mobiles=dataNode->type.dataNode->data;		
+	for( i=0;i<capacity;i++)
+	{
+		if(m.id==mobiles[i].id)
+		{
+			ind=i;
+			retval=SUCCESS;
+		}
+	}
+	if(retval==SUCCESS)
+	{
+		int j=ind;
+		while(j<capacity-1)
+		{
+			mobiles[j+1]=mobiles[j];
+		}
+		dataNode->type.dataNode->used--;
+	}
+	return retval;
+	
+}
+status_code Delete_Mobile(mobile m,treeNode* root){
+	status_code retval=SUCCESS;int num;
+	treeNode *nearest = SearchNearest(m,root,&num);
+
+	switch (num)
+	{
+	case 1:
+		/* code */
+		if(nearest->type.indexNode->first->type.dataNode->used==0)
+		{
+			retval= FAILURE;
+		}
+		else{
+			retval=DeleteinData(m,nearest->type.indexNode->first);		
+			}
+		
+		break;
+	case 2:
+		if(nearest->type.indexNode->second->type.dataNode->used==0)
+		{
+			retval = FAILURE;
+		}
+		else{
+			retval=DeleteinData(m,nearest->type.indexNode->second);
+		}
+		break;
+	case 3:
+		if(nearest->type.indexNode->third->type.dataNode->used==0)
+		{
+			retval=FAILURE;
+		}
+		else{
+			retval=DeleteinData(m,nearest->type.indexNode->third);		
+			}
+		break;
+	case 4:
+		if(nearest->type.indexNode->fourth->type.dataNode->used==0)
+		{
+			retval= FAILURE;
+		}
+		else{
+			retval=DeleteinData(m,nearest->type.indexNode->fourth);		
+			}
+		break;
+	default:
+		break;
+	}
+
+
+	return retval;
+}
+
+treeNode *lowestRouter(treeNode* root, mobile m1, mobile m2) 
+{ 
+	int flag=0;
+    while (root->tag != 'd' && flag==0) 
+    { 
+        if (m1.x < root->type.indexNode->bs1.x && m2.x < root->type.indexNode->bs1.x ) 
+        {
+		   root = root->type.indexNode->first;
+		} 
+		else if((m1.x > root->type.indexNode->bs1.x && m1.x < root->type.indexNode->bs2.x) && (m2.x > root->type.indexNode->bs1.x && m2.x < root->type.indexNode->bs2.x))
+		{
+			root = root->type.indexNode->second;
+		}
+        else if ((m1.x > root->type.indexNode->bs2.x && m1.x < root->type.indexNode->bs3.x) && (m2.x > root->type.indexNode->bs2.x && m2.x < root->type.indexNode->bs3.x)) 
+        {
+		   root = root->type.indexNode->third;
+		}
+		else if(m1.x > root->type.indexNode->bs3.x && m2.x > root->type.indexNode->bs3.x)
+		{
+			root = root->type.indexNode->fourth;
+		} 
+  
+        else flag=1; 
+    } 
+    return root; 
+} 
+boolean SearchIndata(treeNode* dataNode,mobile m)
+{
+	int i;boolean retval=FALSE;
+	for(i=0;i<dataNode->type.dataNode->used;i++)
+	{
+		if(dataNode->type.dataNode->data[i].id == m.id)
+		{
+			retval=TRUE;
+		}
+	}
+	return retval;
+}
+base_station findPhone(mobile m,treeNode* root)
+{
+	treeNode* nearest;int num;base_station retval;
+	nearest=SearchNearest(m,root,&num);
+	switch(num)
+	{
+		case 1:
+			if(SearchIndata(nearest->type.indexNode->first,m))
+			{
+				retval = nearest->type.indexNode->bs1;
+			}
+			break;
+		case 2:
+			if(SearchIndata(nearest->type.indexNode->second,m))
+			{
+				retval = nearest->type.indexNode->bs2;
+			}
+			break;
+		case 3:
+			if(SearchIndata(nearest->type.indexNode->third,m))
+			{
+				retval = nearest->type.indexNode->bs3;
+			}
+			break;		
+		case 4:
+			if(SearchIndata(nearest->type.indexNode->fourth,m))
+			{
+				retval = nearest->type.indexNode->bs3;
+			}
+			break;
+	}
+
+}
+
+status_code CallRoute(mobile m1,mobile m2)
+{
+
 }
 
 int main()
