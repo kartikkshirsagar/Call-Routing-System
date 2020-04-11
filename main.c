@@ -165,7 +165,62 @@ base_station Makebs(int id,int x)
 	bs.x=x;
 	return bs;
 }
+treeNode* makeIndexNode(int x1,int x2,int x3)
+{
+	base_station b1,b2,b3;
+	b1=Makebs(rand()%1000,x1);
+	b2=Makebs(rand()%1000,x2);
+	b3=Makebs(rand()%1000,x3);
+	treeNode* node = (treeNode*)malloc(sizeof(treeNode));
+	node->tag='i';
+	node->type.indexNode->bs1.x=x1;
+	node->type.indexNode->bs2=b2;
+	node->type.indexNode->bs3=b3;
+	node->type.indexNode->first=NULL;
+	node->type.indexNode->second=NULL;
+	node->type.indexNode->third=NULL;
+	node->type.indexNode->fourth=NULL;
+	return node;
+}
+treeNode* makeDataNode(){
+	treeNode* nptr;
+	nptr=(treeNode*)malloc(sizeof(treeNode));
+	nptr->tag='d';
+	nptr->type.dataNode->used=0;
+	return nptr;
+}
 
+treeNode* MakeTree(){
+	treeNode* root,*first,*second,*third,*fourth;
+	root=makeIndexNode(20,50,80);
+	first=root->type.indexNode->first=makeIndexNode(6,12,18);
+	second=root->type.indexNode->second=makeIndexNode(25,35,45);
+	third=root->type.indexNode->third=makeIndexNode(55,65,75);
+	fourth=root->type.indexNode->fourth=makeIndexNode(90,100,120);
+
+	first->type.indexNode->first=makeDataNode();
+	first->type.indexNode->second=makeDataNode();
+	first->type.indexNode->third=makeDataNode();
+	first->type.indexNode->fourth=makeDataNode();
+
+	second->type.indexNode->first=makeDataNode();
+	second->type.indexNode->second=makeDataNode();
+	second->type.indexNode->third=makeDataNode();
+	second->type.indexNode->fourth=makeDataNode();
+
+	third->type.indexNode->first=makeDataNode();
+	third->type.indexNode->second=makeDataNode();
+	third->type.indexNode->third=makeDataNode();
+	third->type.indexNode->fourth=makeDataNode();
+
+	fourth->type.indexNode->first=makeDataNode();
+	fourth->type.indexNode->second=makeDataNode();
+	fourth->type.indexNode->third=makeDataNode();
+	fourth->type.indexNode->fourth=makeDataNode();
+
+	return root;
+
+}
 boolean isDataNodeFull(treeNode *nodeptr)
 {
 	boolean retval = FALSE;
@@ -236,6 +291,7 @@ status_code InsertMobile(mobile mobile, treeNode *root)
 		if(isDataNodeFull(nearest->type.indexNode->first))
 		{
 			retval= FAILURE;
+			printf("NO SPACE LEFT TO INSERT");
 		}
 		else{
 			nearest->type.indexNode->first->type.dataNode->data[nearest->type.indexNode->first->type.dataNode->used++]=mobile;
@@ -429,4 +485,6 @@ status_code CallRoute(mobile m1,mobile m2)
 
 int main()
 {
+	treeNode* root;
+	root=MakeTree();
 }
