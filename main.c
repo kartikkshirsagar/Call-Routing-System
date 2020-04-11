@@ -49,9 +49,7 @@ typedef struct
 
 typedef struct Index_node_type
 {
-	base_station bs1;
-	base_station bs2;
-	base_station bs3;
+	base_station stations[3];
 	struct BPlus_Tree_Node *first;
 	struct BPlus_Tree_Node *second;
 	struct BPlus_Tree_Node *third;
@@ -172,10 +170,12 @@ treeNode* makeIndexNode(int x1,int x2,int x3)
 	b2=Makebs(rand()%1000,x2);
 	b3=Makebs(rand()%1000,x3);
 	treeNode* node = (treeNode*)malloc(sizeof(treeNode));
+	indexNode* iptr=(indexNode*)malloc(sizeof(indexNode));
+	iptr->stations[0]=b1;
+	iptr->stations[1]=b2;
+	iptr->stations[2]=b3;
 	node->tag='i';
-	node->type.indexNode->bs1.x=x1;
-	node->type.indexNode->bs2=b2;
-	node->type.indexNode->bs3=b3;
+	node->type.indexNode=iptr;
 	node->type.indexNode->first=NULL;
 	node->type.indexNode->second=NULL;
 	node->type.indexNode->third=NULL;
@@ -185,8 +185,10 @@ treeNode* makeIndexNode(int x1,int x2,int x3)
 treeNode* makeDataNode(){
 	treeNode* nptr;
 	nptr=(treeNode*)malloc(sizeof(treeNode));
+	dataNode* dptr=(dataNode*)malloc(sizeof(dataNode));
+	dptr->used=0;
 	nptr->tag='d';
-	nptr->type.dataNode->used=0;
+	nptr->type.dataNode=dptr;
 	return nptr;
 }
 
@@ -238,38 +240,38 @@ treeNode *SearchNearest(mobile mobile, treeNode *root, int *datanodeNumber)
 	{
 		retval = root;
 		//we know its one of the 4 base stations where we have to insert.
-		if (mobile.x < root->type.indexNode->bs1.x)
+		if (mobile.x < root->type.indexNode->stations[0].x)
 		{
 			*datanodeNumber = 1;
 		}
-		if (mobile.x > root->type.indexNode->bs1.x && mobile.x < root->type.indexNode->bs2.x)
+		if (mobile.x > root->type.indexNode->stations[0].x && mobile.x < root->type.indexNode->stations[1].x)
 		{
 			*datanodeNumber = 2;
 		}
-		if (mobile.x > root->type.indexNode->bs2.x && mobile.x < root->type.indexNode->bs3.x)
+		if (mobile.x > root->type.indexNode->stations[1].x && mobile.x < root->type.indexNode->stations[2].x)
 		{
 			*datanodeNumber = 3;
 		}
-		if (mobile.x > root->type.indexNode->bs3.x)
+		if (mobile.x > root->type.indexNode->stations[2].x)
 		{
 			*datanodeNumber = 4;
 		}
 	}
 	else
 	{
-		if (mobile.x < root->type.indexNode->bs1.x)
+		if (mobile.x < root->type.indexNode->stations[0].x)
 		{
 			retval=SearchNearest(mobile, root->type.indexNode->first,datanodeNumber);
 		}
-		if (mobile.x > root->type.indexNode->bs1.x && mobile.x < root->type.indexNode->bs2.x)
+		if (mobile.x > root->type.indexNode->stations[0].x && mobile.x < root->type.indexNode->stations[1].x)
 		{
 			retval=SearchNearest(mobile, root->type.indexNode->second,datanodeNumber);
 		}
-		if (mobile.x > root->type.indexNode->bs2.x && mobile.x < root->type.indexNode->bs3.x)
+		if (mobile.x > root->type.indexNode->stations[1].x && mobile.x < root->type.indexNode->stations[2].x)
 		{
 			retval=SearchNearest(mobile, root->type.indexNode->third,datanodeNumber);
 		}
-		if (mobile.x > root->type.indexNode->bs3.x)
+		if (mobile.x > root->type.indexNode->stations[2].x)
 		{
 			retval=SearchNearest(mobile, root->type.indexNode->fourth,datanodeNumber);
 		}
@@ -411,19 +413,19 @@ treeNode *lowestRouter(treeNode* root, mobile m1, mobile m2)
 	int flag=0;
     while (root->tag != 'd' && flag==0) 
     { 
-        if (m1.x < root->type.indexNode->bs1.x && m2.x < root->type.indexNode->bs1.x ) 
+        if (m1.x < root->type.indexNode->stations[0].x && m2.x < root->type.indexNode->stations[0].x ) 
         {
 		   root = root->type.indexNode->first;
 		} 
-		else if((m1.x > root->type.indexNode->bs1.x && m1.x < root->type.indexNode->bs2.x) && (m2.x > root->type.indexNode->bs1.x && m2.x < root->type.indexNode->bs2.x))
+		else if((m1.x > root->type.indexNode->stations[0].x && m1.x < root->type.indexNode->stations[1].x) && (m2.x > root->type.indexNode->stations[0].x && m2.x < root->type.indexNode->stations[1].x))
 		{
 			root = root->type.indexNode->second;
 		}
-        else if ((m1.x > root->type.indexNode->bs2.x && m1.x < root->type.indexNode->bs3.x) && (m2.x > root->type.indexNode->bs2.x && m2.x < root->type.indexNode->bs3.x)) 
+        else if ((m1.x > root->type.indexNode->stations[1].x && m1.x < root->type.indexNode->stations[2].x) && (m2.x > root->type.indexNode->stations[1].x && m2.x < root->type.indexNode->stations[2].x)) 
         {
 		   root = root->type.indexNode->third;
 		}
-		else if(m1.x > root->type.indexNode->bs3.x && m2.x > root->type.indexNode->bs3.x)
+		else if(m1.x > root->type.indexNode->stations[2].x && m2.x > root->type.indexNode->stations[2].x)
 		{
 			root = root->type.indexNode->fourth;
 		} 
@@ -453,25 +455,25 @@ base_station findPhone(mobile m,treeNode* root)
 		case 1:
 			if(SearchIndata(nearest->type.indexNode->first,m))
 			{
-				retval = nearest->type.indexNode->bs1;
+				retval = nearest->type.indexNode->stations[0];
 			}
 			break;
 		case 2:
 			if(SearchIndata(nearest->type.indexNode->second,m))
 			{
-				retval = nearest->type.indexNode->bs2;
+				retval = nearest->type.indexNode->stations[1];
 			}
 			break;
 		case 3:
 			if(SearchIndata(nearest->type.indexNode->third,m))
 			{
-				retval = nearest->type.indexNode->bs3;
+				retval = nearest->type.indexNode->stations[2];
 			}
 			break;		
 		case 4:
 			if(SearchIndata(nearest->type.indexNode->fourth,m))
 			{
-				retval = nearest->type.indexNode->bs3;
+				retval = nearest->type.indexNode->stations[2];
 			}
 			break;
 	}
