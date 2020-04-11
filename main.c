@@ -481,10 +481,83 @@ base_station* findPhone(mobile m,treeNode* root)
 
 }
 
-status_code CallRoute(mobile m1,mobile m2)
+void printBase(treeNode* nptr,int num){
+	printf("\n");
+	printf("------------------------------------------------------");
+
+	switch (num)
+	{
+	case 1:
+		printf("Base Station ID-> %d",nptr->type.indexNode->stations[0].id);
+		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[0].x);
+		break;
+	case 2:
+		printf("Base Station ID-> %d",nptr->type.indexNode->stations[1].id);
+		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[1].x);
+		break;
+	
+	case 3:
+		printf("Base Station ID-> %d",nptr->type.indexNode->stations[2].id);
+		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[2].x);
+		break;
+	
+	case 4:
+		printf("Base Station ID-> %d",nptr->type.indexNode->stations[2].id);
+		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[2].x);
+		break;
+	default:
+		break;
+	}
+	printf("------------------------------------------------------");
+}
+
+void PrintMobile(mobile m)
 {
+	printf("--------------------\n");
+	printf("Mobile ID is %d\n",m.id);
+	printf("Mobile Coordinate is %d\n",m.x);
+	printf("--------------------\n");
 
 }
+
+
+void PrintData(treeNode* dataNode)
+{
+	int i;
+	int used=dataNode->type.dataNode->used;
+	for(i=0;i<used;i++)
+	{
+		PrintMobile(dataNode->type.dataNode->data[i]);
+	}
+}
+void TraverseAllData(treeNode* root){
+	if(root->tag=='d')
+	{
+		PrintData(root);
+	}
+	else{
+		TraverseAllData(root->type.indexNode->first);
+		TraverseAllData(root->type.indexNode->second);
+		TraverseAllData(root->type.indexNode->third);
+		TraverseAllData(root->type.indexNode->fourth);
+	}
+
+	
+}
+// status_code CallRoute(treeNode* root,mobile m1,mobile m2)
+// {
+// 	treeNode* common= lowestRouter(root,m1,m2);
+// 	int num;
+// 	base_station *bptr = findPhone(m1,root);
+// 	treeNode *last=SearchNearest(m1,common,&num);
+// 	while(last!=common)
+// 	{
+// 		printBase(last,num);
+// 		printBase(&last,)
+// 	}
+	
+
+// }
 
 int main()
 {
@@ -493,5 +566,7 @@ int main()
 	mobile m=MakeMobile(100,10);
 	InsertMobile(m,root);
 	base_station* bs=findPhone(m,root);
-	printf("%d",bs->x);
+	printf("%d\n",bs->x);
+	TraverseAllData(root);
+
 }
