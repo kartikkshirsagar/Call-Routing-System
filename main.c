@@ -446,37 +446,38 @@ boolean SearchIndata(treeNode* dataNode,mobile m)
 	}
 	return retval;
 }
-base_station findPhone(mobile m,treeNode* root)
+base_station* findPhone(mobile m,treeNode* root)
 {
-	treeNode* nearest;int num;base_station retval;
+	treeNode* nearest;int num;base_station* retval;
 	nearest=SearchNearest(m,root,&num);
 	switch(num)
 	{
 		case 1:
 			if(SearchIndata(nearest->type.indexNode->first,m))
 			{
-				retval = nearest->type.indexNode->stations[0];
+				retval = &nearest->type.indexNode->stations[0];
 			}
 			break;
 		case 2:
 			if(SearchIndata(nearest->type.indexNode->second,m))
 			{
-				retval = nearest->type.indexNode->stations[1];
+				retval = &nearest->type.indexNode->stations[1];
 			}
 			break;
 		case 3:
 			if(SearchIndata(nearest->type.indexNode->third,m))
 			{
-				retval = nearest->type.indexNode->stations[2];
+				retval = &nearest->type.indexNode->stations[2];
 			}
 			break;		
 		case 4:
 			if(SearchIndata(nearest->type.indexNode->fourth,m))
 			{
-				retval = nearest->type.indexNode->stations[2];
+				retval = &nearest->type.indexNode->stations[2];
 			}
 			break;
 	}
+	return retval;
 
 }
 
@@ -489,4 +490,8 @@ int main()
 {
 	treeNode* root;
 	root=MakeTree();
+	mobile m=MakeMobile(100,10);
+	InsertMobile(m,root);
+	base_station* bs=findPhone(m,root);
+	printf("%d",bs->x);
 }
