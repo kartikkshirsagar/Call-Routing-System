@@ -42,7 +42,7 @@ typedef struct base_station
 
 typedef struct
 {
-	int *array;
+	mobile *array;
 	size_t used;
 	size_t size;
 } vector;
@@ -78,7 +78,7 @@ typedef struct BPlus_Tree_Node
 
 void initVector(vector *a)
 {
-	a->array = (int *)malloc(INITSIZE * sizeof(int));
+	a->array = (mobile *)malloc(INITSIZE * sizeof(mobile));
 	a->used = 0;
 	a->size = INITSIZE;
 }
@@ -89,14 +89,14 @@ void initVector(vector *a)
 //     retval=sqrt(retval);
 //     return (int)retval;
 // }
-void push_back(vector *a, int element)
+void push_back(vector *a, mobile element)
 {
 	// a->used is the number of used entries, because a->array[a->used++] updates a->used only *after* the array has been accessed.
 	// Therefore a->used can go up to a->size
 	if (a->used == a->size)
 	{
 		a->size *= 2;
-		a->array = (int *)realloc(a->array, a->size * sizeof(int));
+		a->array = (mobile *)realloc(a->array, a->size * sizeof(mobile));
 	}
 	a->array[a->used] = element;
 	a->used++;
@@ -117,7 +117,7 @@ void removeAt(vector *a, int i)
 	if (a->used <= (a->size / 2))
 	{
 		a->size = a->size / 2;
-		a->array = (int *)realloc(a->array, a->size * sizeof(int));
+		a->array = (mobile *)realloc(a->array, a->size * sizeof(mobile));
 	}
 }
 void clear(vector *a)
@@ -126,16 +126,16 @@ void clear(vector *a)
 	a->array = NULL;
 	a->used = a->size = 0;
 }
-void printVector(vector *a)
-{
-	int i;
-	for (i = 0; i < a->used; i++)
-	{
-		printf("%d ", a->array[i]);
-	}
-	//printf(" --%ld-- ",a->size);
-	printf("\n");
-}
+// void printVector(vector *a)
+// {
+// 	int i;
+// 	for (i = 0; i < a->used; i++)
+// 	{
+// 		printf("%d ", a->array[i]);
+// 	}
+// 	//printf(" --%ld-- ",a->size);
+// 	printf("\n");
+// }
 
 // coordinate shiftPoint(coordinate newOrigin,coordinate oldOrigin,coordinate point)
 // {
@@ -481,33 +481,31 @@ base_station* findPhone(mobile m,treeNode* root)
 
 }
 
-void printBase(treeNode* nptr,int num){
+void printBase(treeNode* root,mobile mobile){
 	printf("\n");
 	printf("------------------------------------------------------\n");
 
-	switch (num)
-	{
-	case 1:
-		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[0].id);
-		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[0].x);
-		break;
-	case 2:
-		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[1].id);
-		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[1].x);
-		break;
-	
-	case 3:
-		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[2].id);
-		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[2].x);
-		break;
-	
-	case 4:
-		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[2].id);
-		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[2].x);
-		break;
-	default:
-		break;
-	}
+		if (mobile.x < root->type.indexNode->stations[0].x)
+		{
+			printf("Base Station ID-> %d\n",root->type.indexNode->stations[0].id);
+			printf("Base Station Coordinate-> %d\n",root->type.indexNode->stations[0].x);
+		}
+		else if (mobile.x > root->type.indexNode->stations[0].x && mobile.x < root->type.indexNode->stations[1].x)
+		{
+			printf("Base Station ID-> %d\n",root->type.indexNode->stations[1].id);
+			printf("Base Station Coordinate-> %d\n",root->type.indexNode->stations[1].x);
+		}
+		else if (mobile.x > root->type.indexNode->stations[1].x && mobile.x < root->type.indexNode->stations[2].x)
+		{
+			printf("Base Station ID-> %d\n",root->type.indexNode->stations[2].id);
+			printf("Base Station Coordinate-> %d\n",root->type.indexNode->stations[2].x);
+		}
+		else if (mobile.x > root->type.indexNode->stations[2].x)
+		{
+			printf("Base Station ID-> %d\n",root->type.indexNode->stations[2].id);
+			printf("Base Station Coordinate-> %d\n",root->type.indexNode->stations[2].x);
+		}
+
 	printf("------------------------------------------------------\n");
 }
 
@@ -530,20 +528,62 @@ void PrintData(treeNode* dataNode)
 		PrintMobile(dataNode->type.dataNode->data[i]);
 	}
 }
-void TraverseAllData(treeNode* root){
+
+void getData(treeNode* dataNode,vector* set)
+{
+	int i;
+	int used=dataNode->type.dataNode->used;
+	for(i=0;i<used;i++)
+	{
+		push_back(set,dataNode->type.dataNode->data[i]);
+	}
+}
+
+void TraverseAllDataAndPrint(treeNode* root){
 	if(root->tag=='d')
 	{
 		PrintData(root);
 	}
 	else{
-		TraverseAllData(root->type.indexNode->first);
-		TraverseAllData(root->type.indexNode->second);
-		TraverseAllData(root->type.indexNode->third);
-		TraverseAllData(root->type.indexNode->fourth);
+		TraverseAllDataAndPrint(root->type.indexNode->first);
+		TraverseAllDataAndPrint(root->type.indexNode->second);
+		TraverseAllDataAndPrint(root->type.indexNode->third);
+		TraverseAllDataAndPrint(root->type.indexNode->fourth);
 	}
 
 	
 }
+
+void TraverseAllDataAndGet(treeNode* root,vector* v){
+	if(root->tag=='d')
+	{
+		getData(root,v);
+	}
+	else{
+		TraverseAllDataAndGet(root->type.indexNode->first,v);
+		TraverseAllDataAndGet(root->type.indexNode->second,v);
+		TraverseAllDataAndGet(root->type.indexNode->third,v);
+		TraverseAllDataAndGet(root->type.indexNode->fourth,v);
+	}
+
+	
+}
+
+void isSetEmpty(treeNode* node)
+{
+	vector v;  
+	initVector(&v);
+	TraverseAllDataAndGet(node,&v);
+	if(v.used==0)
+	{
+		printf("It's Empty");
+	}
+	else{
+		printf("Not Empty");
+	}
+}
+
+
 
 void PrintChildToParent(treeNode* root,treeNode* last,mobile m,int num)
 {
@@ -566,37 +606,100 @@ void PrintChildToParent(treeNode* root,treeNode* last,mobile m,int num)
 			PrintChildToParent(root->type.indexNode->fourth,last,m,4);
 		}	
 	}
-	else
-	{
-		printBase(root,num);
+	printBase(root,m);
 		
+}
+
+
+void PrintParentToChild(treeNode* root,treeNode* last,mobile m)
+{
+	static int i=0;
+	i++;
+	if(root->tag!='d')
+	{
+		if(m.x < root->type.indexNode->stations[0].x )
+		{
+			if(i!=0)
+			{
+				printBase(root,m);
+			}
+			PrintParentToChild(root->type.indexNode->first,last,m);
+		}
+		else if(m.x > root->type.indexNode->stations[0].x && m.x < root->type.indexNode->stations[1].x)
+		{
+			if(i!=0)
+			{
+				printBase(root,m);
+			}
+			PrintParentToChild(root->type.indexNode->second,last,m);
+		}
+		else if(m.x > root->type.indexNode->stations[1].x && m.x < root->type.indexNode->stations[2].x)
+		{
+			if(i!=0)
+			{
+				printBase(root,m);
+			}
+			PrintParentToChild(root->type.indexNode->third,last,m);
+		}
+		else
+		{
+			if(i!=0)
+			{
+				printBase(root,m);
+			}
+			PrintParentToChild(root->type.indexNode->fourth,last,m);
+		}	
 	}
 }
 
-// status_code CallRoute(treeNode* root,mobile m1,mobile m2)
-// {
-// 	treeNode* common= lowestRouter(root,m1,m2);
-// 	int num;
-// 	base_station *bptr = findPhone(m1,root);
-// 	treeNode *last=SearchNearest(m1,common,&num);
-// 	while(last!=common)
-// 	{
-// 		printBase(last,num);
-// 		printBase(&last,)
-// 	}
-	
+status_code CallRoute(treeNode* root,mobile m1,mobile m2)
+{
+	int num;
+	PrintChildToParent(root,SearchNearest(m1,root,&num),m1,1);
+	PrintParentToChild(lowestRouter(root,m1,m2),SearchNearest(m2,root,&num),m2);
 
-// }
+}
 
 int main()
 {
 	treeNode* root;int num;
 	root=MakeTree();
 	mobile m=MakeMobile(100,10);
+	mobile m2=MakeMobile(101,60);
 	InsertMobile(m,root);
+	InsertMobile(m2,root);
 	base_station* bs=findPhone(m,root);
 	printf("%d\n",bs->x);
 	//TraverseAllData(root);
-	PrintChildToParent(root,SearchNearest(m,root,&num),m,1);
+	CallRoute(root,m,m2);
+	isSetEmpty(root->type.indexNode->first);
+
+	int ans;
+	while(1){
+		printf("Enter the operation you want to do\n");
+		printf("1.Insert Mobile\n2.Delete Mobile\n3.Call Route Trace\n4.Find out if a set is empty\n5.Find out a mobile's base station\n");
+		scanf("%d",&ans);
+		switch (ans)
+		{
+		case 1:
+			
+			break;
+		case 2:
+			break;
+		
+		case 3:
+			break;
+
+		case 4:
+			break;					
+		
+		case 5:
+			break;
+
+		case 6:
+			break;					
+		}
+	}
+	
 
 }
