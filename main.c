@@ -483,32 +483,32 @@ base_station* findPhone(mobile m,treeNode* root)
 
 void printBase(treeNode* nptr,int num){
 	printf("\n");
-	printf("------------------------------------------------------");
+	printf("------------------------------------------------------\n");
 
 	switch (num)
 	{
 	case 1:
-		printf("Base Station ID-> %d",nptr->type.indexNode->stations[0].id);
-		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[0].x);
+		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[0].id);
+		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[0].x);
 		break;
 	case 2:
-		printf("Base Station ID-> %d",nptr->type.indexNode->stations[1].id);
-		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[1].x);
+		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[1].id);
+		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[1].x);
 		break;
 	
 	case 3:
-		printf("Base Station ID-> %d",nptr->type.indexNode->stations[2].id);
-		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[2].x);
+		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[2].id);
+		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[2].x);
 		break;
 	
 	case 4:
-		printf("Base Station ID-> %d",nptr->type.indexNode->stations[2].id);
-		printf("Base Station Coordinate-> %d",nptr->type.indexNode->stations[2].x);
+		printf("Base Station ID-> %d\n",nptr->type.indexNode->stations[2].id);
+		printf("Base Station Coordinate-> %d\n",nptr->type.indexNode->stations[2].x);
 		break;
 	default:
 		break;
 	}
-	printf("------------------------------------------------------");
+	printf("------------------------------------------------------\n");
 }
 
 void PrintMobile(mobile m)
@@ -544,6 +544,35 @@ void TraverseAllData(treeNode* root){
 
 	
 }
+
+void PrintChildToParent(treeNode* root,treeNode* last,mobile m,int num)
+{
+	if(last!=root)
+	{
+		if(m.x < root->type.indexNode->stations[0].x )
+		{
+			PrintChildToParent(root->type.indexNode->first,last,m,1);
+		}
+		else if(m.x > root->type.indexNode->stations[0].x && m.x < root->type.indexNode->stations[1].x)
+		{
+			PrintChildToParent(root->type.indexNode->second,last,m,2);
+		}
+		else if(m.x > root->type.indexNode->stations[1].x && m.x < root->type.indexNode->stations[2].x)
+		{
+			PrintChildToParent(root->type.indexNode->third,last,m,3);
+		}
+		else
+		{
+			PrintChildToParent(root->type.indexNode->fourth,last,m,4);
+		}	
+	}
+	else
+	{
+		printBase(root,num);
+		
+	}
+}
+
 // status_code CallRoute(treeNode* root,mobile m1,mobile m2)
 // {
 // 	treeNode* common= lowestRouter(root,m1,m2);
@@ -561,12 +590,13 @@ void TraverseAllData(treeNode* root){
 
 int main()
 {
-	treeNode* root;
+	treeNode* root;int num;
 	root=MakeTree();
 	mobile m=MakeMobile(100,10);
 	InsertMobile(m,root);
 	base_station* bs=findPhone(m,root);
 	printf("%d\n",bs->x);
-	TraverseAllData(root);
+	//TraverseAllData(root);
+	PrintChildToParent(root,SearchNearest(m,root,&num),m,1);
 
 }
