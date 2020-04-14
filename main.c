@@ -581,8 +581,9 @@ void TraverseAllDataAndGet(treeNode *root, vector *v)
 	}
 }
 
-treeNode *SearchBase(int x, treeNode *root)
+void SearchBase(int x, treeNode *root,treeNode** ret)
 {
+	treeNode** retval;
 	if (root->tag != 'd')
 	{
 		int i;
@@ -592,14 +593,16 @@ treeNode *SearchBase(int x, treeNode *root)
 			{
 				if (root->type.indexNode->stations[i].x == x)
 				{
-					return root;
+					ret= &root;
 				}
 			}
 		}
-		SearchBase(x, root->type.indexNode->first);
-		SearchBase(x, root->type.indexNode->second);
-		SearchBase(x, root->type.indexNode->third);
-		SearchBase(x, root->type.indexNode->fourth);
+		
+		SearchBase(x, root->type.indexNode->first,ret);
+		SearchBase(x, root->type.indexNode->second,ret);
+		SearchBase(x, root->type.indexNode->third,ret);
+		SearchBase(x, root->type.indexNode->fourth,ret);
+		
 	}
 }
 
@@ -710,8 +713,12 @@ int main()
 	base_station *bs = findPhone(m, root);
 	printf("%d\n", bs->x);
 	//TraverseAllData(root);
-	CallRoute(root, m, m2);
-	isSetEmpty(root->type.indexNode->first);
+	//CallRoute(root, m, m2);
+	//isSetEmpty(root->type.indexNode->first);
+	treeNode** node;
+	treeNode* node1 = *node;
+	SearchBase(45,root,node);
+	printf("%d",node1->type.indexNode->stations[0].x);
 
 	int ans;
 	while (1)
@@ -719,17 +726,18 @@ int main()
 		printf("Enter the operation you want to do\n");
 		printf("1.Insert Mobile\n2.Delete Mobile\n3.Call Route Trace\n4.Find out if a set is empty\n5.Find out a mobile's base station\n6.Move mobile to another base station\n");
 		scanf("%d", &ans);
+		int mobileid, mobilex;
+		int id1, id2, x1, x2;
 		switch (ans)
 		{
 		case 1:
-			int mobileid, mobilex;
 			printf("Please enter id and x-coordinate\n");
 			scanf("%d %d", &mobileid, &mobilex);
-			mobile m = MakeMobile(mobileid, mobilex);
+			m = MakeMobile(mobileid, mobilex);
 			InsertMobile(m, root);
 			break;
 		case 2:
-			int mobileid, mobilex;
+			
 			printf("Please enter id and x-coordinate\n");
 			scanf("%d %d", &mobileid, &mobilex);
 			mobile m = MakeMobile(mobileid, mobilex);
@@ -738,15 +746,15 @@ int main()
 
 		case 3:
 			printf("Please enter id and x-coordinate of both phones(id1,x1,id2,x2)");
-			int id1, id2, x1, x2;
+			
 			scanf("%d %d %d %d", &id1, &x1, &id2, &x2);
-			mobile m = MakeMobile(id1, x1);
-			mobile m2 = MakeMobile(id2, x2);
+			m = MakeMobile(id1, x1);
+			m2 = MakeMobile(id2, x2);
 			CallRoute(root, m, m2);
 			break;
 
 		case 4:
-			printf() break;
+			//printf() break;
 
 		case 5:
 			break;
