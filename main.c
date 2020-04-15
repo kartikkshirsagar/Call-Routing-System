@@ -356,6 +356,7 @@ status_code DeleteinData(mobile m, treeNode *dataNode)
 		while (j < capacity - 1)
 		{
 			mobiles[j + 1] = mobiles[j];
+			j++;
 		}
 		dataNode->type.dataNode->used--;
 	}
@@ -462,7 +463,7 @@ base_station *findPhone(mobile m, treeNode *root)
 {
 	treeNode *nearest;
 	int num;
-	base_station *retval;
+	base_station *retval=NULL;
 	nearest = SearchNearest(m, root, &num);
 	switch (num)
 	{
@@ -718,12 +719,14 @@ int main()
 	treeNode** node;
 	treeNode* node1 = *node;
 	SearchBase(45,root,node);
-	printf("%d",node1->type.indexNode->stations[0].x);
+	base_station b;
+	//printf("%d",node1->type.indexNode->stations[0].x);
+	int tempid=rand()%1000,basex;
 
 	int ans;
 	while (1)
 	{
-		printf("Enter the operation you want to do\n");
+		printf("\n\nEnter the operation you want to do\n");
 		printf("1.Insert Mobile\n2.Delete Mobile\n3.Call Route Trace\n4.Find out if a set is empty\n5.Find out a mobile's base station\n6.Move mobile to another base station\n");
 		scanf("%d", &ans);
 		int mobileid, mobilex;
@@ -754,12 +757,32 @@ int main()
 			break;
 
 		case 4:
-			//printf() break;
-
-		case 5:
+			//printf() 
 			break;
 
+		case 5:
+		printf("Please enter id and x-coordinate\n");
+		scanf("%d %d", &mobileid, &mobilex);
+		m=MakeMobile(mobileid,mobilex);
+		bs=findPhone(m,root);
+		if(bs==NULL)
+		{
+			printf("This mobile doesn't exist.\n");
+		}
+		else{
+			printf("The mobile is associated with base station with id %d and co-ordinate %d\n",bs->id,bs->x);
+		}
+		break;
+
 		case 6:
+		printf("For moving mobile, we would need to change co-ordinates of the mobile so as to maintain the inner sorting... ");
+		printf("Please enter mobile id and mobile x-coordinate\n");
+		scanf("%d %d", &mobileid, &mobilex);
+		m=MakeMobile(mobileid,mobilex);
+		printf("Please enter basestation x-coordinate\n");
+		scanf("%d",&basex);
+		b=Makebs(tempid,basex);
+		moveMobile(m,b,root);
 			break;
 		}
 	}
