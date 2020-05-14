@@ -463,7 +463,7 @@ base_station *findPhone(mobile m, treeNode *root)
 {
 	treeNode *nearest;
 	int num;
-	base_station *retval=NULL;
+	base_station *retval = NULL;
 	nearest = SearchNearest(m, root, &num);
 	switch (num)
 	{
@@ -582,9 +582,9 @@ void TraverseAllDataAndGet(treeNode *root, vector *v)
 	}
 }
 
-void SearchBase(int x, treeNode *root,treeNode** ret)
+void SearchBase(int x, treeNode *root, treeNode **ret)
 {
-	treeNode** retval;
+	treeNode **retval;
 	if (root->tag != 'd')
 	{
 		int i;
@@ -594,16 +594,15 @@ void SearchBase(int x, treeNode *root,treeNode** ret)
 			{
 				if (root->type.indexNode->stations[i].x == x)
 				{
-					ret= &root;
+					ret = &root;
 				}
 			}
 		}
-		
-		SearchBase(x, root->type.indexNode->first,ret);
-		SearchBase(x, root->type.indexNode->second,ret);
-		SearchBase(x, root->type.indexNode->third,ret);
-		SearchBase(x, root->type.indexNode->fourth,ret);
-		
+
+		SearchBase(x, root->type.indexNode->first, ret);
+		SearchBase(x, root->type.indexNode->second, ret);
+		SearchBase(x, root->type.indexNode->third, ret);
+		SearchBase(x, root->type.indexNode->fourth, ret);
 	}
 }
 
@@ -618,8 +617,38 @@ void isSetEmpty(treeNode *node)
 	}
 	else
 	{
-		printf("Not Empty");
+		printf("Not Empty\n");
+		printf("The elements are:\n");
+		for (int i = 0; i < v.used; i++)
+		{
+			printf(" ID-->%d ", v.array[i].id);
+		}
 	}
+}
+
+void PrintBase(base_station b)
+{
+	printf("|-----------------------|\n");
+	printf("|Base ID is %3d         |\n", b.id);
+	printf("|Base Coordinate is %3d |\n", b.x);
+	printf("|-----------------------|\n");
+}
+void treePrint(treeNode *root)
+{
+	if (root == NULL || root->tag == 'd')
+	{
+		return;
+	}
+
+	for (int i = 0; i < capacity - 1; i++)
+	{
+		PrintBase(root->type.indexNode->stations[i]);
+	}
+	printf("\n\n");
+	treePrint(root->type.indexNode->first);
+	treePrint(root->type.indexNode->second);
+	treePrint(root->type.indexNode->third);
+	treePrint(root->type.indexNode->fourth);
 }
 
 void PrintChildToParent(treeNode *root, treeNode *last, mobile m, int num)
@@ -644,6 +673,34 @@ void PrintChildToParent(treeNode *root, treeNode *last, mobile m, int num)
 		}
 	}
 	printBase(root, m);
+}
+
+treeNode *findBS(int x, treeNode *root)
+{
+	if (root == NULL)
+	{
+		return root;
+	}
+	if (root->type.indexNode->stations[0].x == x || root->type.indexNode->stations[1].x == x || root->type.indexNode->stations[2].x == x)
+	{
+		return root;
+	}
+	if (x <= root->type.indexNode->stations[0].x)
+	{
+		findBS(x, root->type.indexNode->first);
+	}
+	else if (x <= root->type.indexNode->stations[1].x && x > root->type.indexNode->stations[0].x)
+	{
+		findBS(x, root->type.indexNode->second);
+	}
+	else if (x <= root->type.indexNode->stations[2].x && x > root->type.indexNode->stations[1].x)
+	{
+		findBS(x, root->type.indexNode->third);
+	}
+	else
+	{
+		findBS(x, root->type.indexNode->fourth);
+	}
 }
 
 void PrintParentToChild(treeNode *root, treeNode *last, mobile m)
@@ -716,21 +773,21 @@ int main()
 	//TraverseAllData(root);
 	//CallRoute(root, m, m2);
 	//isSetEmpty(root->type.indexNode->first);
-	treeNode** node;
-	treeNode* node1 = *node;
-	SearchBase(45,root,node);
+	treeNode **node;
+	treeNode *node1 = *node;
+	SearchBase(45, root, node);
 	base_station b;
 	//printf("%d",node1->type.indexNode->stations[0].x);
-	int tempid=rand()%1000,basex;
-
+	int tempid = rand() % 1000, basex;
+	//treePrint(root);
 	int ans;
 	while (1)
 	{
 		printf("\n\nEnter the operation you want to do\n");
-		printf("1.Insert Mobile\n2.Delete Mobile\n3.Call Route Trace\n4.Find out if a set is empty\n5.Find out a mobile's base station\n6.Move mobile to another base station\n");
+		printf("1.Insert Mobile\n2.Delete Mobile\n3.Call Route Trace\n4.Find out if a set is empty(Enter Base Station coordinate)\n5.Find out a mobile's base station\n6.Move mobile to another base station\n7.Print Base stations\n");
 		scanf("%d", &ans);
 		int mobileid, mobilex;
-		int id1, id2, x1, x2;
+		int id1, id2, x1, x2, x;
 		switch (ans)
 		{
 		case 1:
@@ -740,7 +797,7 @@ int main()
 			InsertMobile(m, root);
 			break;
 		case 2:
-			
+
 			printf("Please enter id and x-coordinate\n");
 			scanf("%d %d", &mobileid, &mobilex);
 			mobile m = MakeMobile(mobileid, mobilex);
@@ -749,7 +806,7 @@ int main()
 
 		case 3:
 			printf("Please enter id and x-coordinate of both phones(id1,x1,id2,x2)");
-			
+
 			scanf("%d %d %d %d", &id1, &x1, &id2, &x2);
 			m = MakeMobile(id1, x1);
 			m2 = MakeMobile(id2, x2);
@@ -757,33 +814,39 @@ int main()
 			break;
 
 		case 4:
-			//printf() 
+			printf("Please Enter co-ordinate of the base station you want to check the set of\n");
+			scanf("%d", &x);
+			isSetEmpty(findBS(x, root));
 			break;
 
 		case 5:
-		printf("Please enter id and x-coordinate\n");
-		scanf("%d %d", &mobileid, &mobilex);
-		m=MakeMobile(mobileid,mobilex);
-		bs=findPhone(m,root);
-		if(bs==NULL)
-		{
-			printf("This mobile doesn't exist.\n");
-		}
-		else{
-			printf("The mobile is associated with base station with id %d and co-ordinate %d\n",bs->id,bs->x);
-		}
-		break;
+			printf("Please enter id and x-coordinate\n");
+			scanf("%d %d", &mobileid, &mobilex);
+			m = MakeMobile(mobileid, mobilex);
+			bs = findPhone(m, root);
+			if (bs == NULL)
+			{
+				printf("This mobile doesn't exist.\n");
+			}
+			else
+			{
+				printf("The mobile is associated with base station with id %d and co-ordinate %d\n", bs->id, bs->x);
+			}
+			break;
 
 		case 6:
-		printf("For moving mobile, we would need to change co-ordinates of the mobile so as to maintain the inner sorting... ");
-		printf("Please enter mobile id and mobile x-coordinate\n");
-		scanf("%d %d", &mobileid, &mobilex);
-		m=MakeMobile(mobileid,mobilex);
-		printf("Please enter basestation x-coordinate\n");
-		scanf("%d",&basex);
-		b=Makebs(tempid,basex);
-		moveMobile(m,b,root);
+			printf("For moving mobile, we would need to change co-ordinates of the mobile so as to maintain the inner sorting... ");
+			printf("Please enter mobile id and mobile x-coordinate\n");
+			scanf("%d %d", &mobileid, &mobilex);
+			m = MakeMobile(mobileid, mobilex);
+			printf("Please enter basestation x-coordinate\n");
+			scanf("%d", &basex);
+			b = Makebs(tempid, basex);
+			moveMobile(m, b, root);
 			break;
+
+		case 7:
+			treePrint(root);
 		}
 	}
 }
